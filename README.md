@@ -91,6 +91,23 @@ Classification report summary (test set, support = 114):
 | SVM | 0.98 | 0.99 / 0.98 / 0.98 | 0.98 / 0.98 / 0.98 |
 | XGBoost | 0.96 | 0.96 / 0.95 / 0.95 | 0.96 / 0.96 / 0.96 |
 
+## Cross-Validation Results (5-Fold)
+
+To ensure robustness and generalization, 5-fold cross-validation was applied to all models.
+
+### Results
+
+- Random Forest: **0.9561 +/- 0.0228**
+- SVM: **0.9736 +/- 0.0147**
+- XGBoost: **0.9736 +/- 0.0147**
+
+### Key Insights
+
+- **SVM and XGBoost achieved the highest mean accuracy (97.36%)**, indicating strong predictive performance.
+- Both models also show **low standard deviation (~0.0147)**, suggesting stable performance across different folds.
+- Random Forest performed slightly lower but still maintained solid generalization capability.
+- Low variance across all models indicates that the dataset is well-structured and suitable for classification tasks.
+
 ## Explainability Results (SHAP)
 
 Generated artifacts in `reports/`:
@@ -142,12 +159,12 @@ Run notebooks in this order:
 ## Notes and Limitations
 
 - This project is educational and demonstrates ML workflow and model interpretability.
-- Results are based on a single train/test split (`random_state=42`) and can be extended with cross-validation.
+- Results include both a single train/test split (`random_state=42`) and 5-fold cross-validation.
 - This is not a clinical diagnostic system.
 
 ## Future Improvements
 
-- Add cross-validation and hyperparameter tuning
+- Add hyperparameter tuning
 - Add ROC-AUC and PR-AUC comparison
 - Add model persistence (joblib/pickle)
 - Add a simple inference script in `src/`
