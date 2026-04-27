@@ -1,12 +1,12 @@
 # Breast Cancer Classification and Explainability
 
-This project builds and evaluates classical machine learning models for breast cancer diagnosis support using the Wisconsin Breast Cancer dataset. It also includes model interpretability with SHAP to explain feature-level impact on predictions.
+This project builds and evaluates classical machine learning models for breast cancer diagnosis support using the Wisconsin Breast Cancer dataset. It includes rigorous model evaluation via 5-fold cross-validation and SHAP-based interpretability to explain feature-level impact on predictions.
 
 ## Project Highlights
 
 - End-to-end notebook workflow from data loading to explainability
 - Comparison of three classifiers: Random Forest, SVM, and XGBoost
-- Strong model performance (all models above 95% accuracy)
+- Robust evaluation using 5-fold cross-validation - SVM and XGBoost achieve 97.36% +/- 1.47% mean accuracy
 - SHAP visual reports saved in the reports folder
 
 ## Project Structure
@@ -37,10 +37,8 @@ ml-health/
 - Target: 1 output column (`target`)
 - Total columns in CSV: 31 (30 features + target)
 - Class distribution:
-  - `target = 1`: 357
-  - `target = 0`: 212
-
-In the original sklearn dataset mapping, `target = 0` is malignant and `target = 1` is benign.
+  - `target = 1`: 357 (benign)
+  - `target = 0`: 212 (malignant)
 
 ## Workflow
 
@@ -56,15 +54,11 @@ In the original sklearn dataset mapping, `target = 0` is malignant and `target =
 
 3. `notebooks/step3_preprocessing.ipynb`
    - Train/test split (80/20)
-   - Feature scaling with `StandardScaler`
-   - Prevents leakage by fitting scaler on training data only
+   - Feature scaling with `StandardScaler` fitted on training data only to prevent leakage
 
 4. `notebooks/step4_model_training.ipynb`
-   - Trains:
-     - `RandomForestClassifier`
-     - `SVC(probability=True)`
-     - `XGBClassifier`
-   - Evaluates accuracy and classification reports
+   - Trains `RandomForestClassifier`, `SVC(probability=True)`, and `XGBClassifier`
+   - Evaluates accuracy, classification reports, and 5-fold cross-validation for all models
 
 5. `notebooks/step5_shap_interpretability.ipynb`
    - Trains XGBoost for explainability analysis
@@ -73,50 +67,33 @@ In the original sklearn dataset mapping, `target = 0` is malignant and `target =
 
 ## Model Results
 
-The saved notebook outputs report the following test-set accuracies:
-
-| Model | Accuracy |
-|------|----------|
-| Random Forest | 0.9649 (96.49%) |
-| SVM | 0.9825 (98.25%) |
-| XGBoost | 0.9561 (95.61%) |
-
-Best-performing model by accuracy: SVM.
-
-Classification report summary (test set, support = 114):
+### Test-Set Performance (80/20 split)
 
 | Model | Accuracy | Macro Avg (P/R/F1) | Weighted Avg (P/R/F1) |
 |------|----------|--------------------|------------------------|
-| Random Forest | 0.96 | 0.97 / 0.96 / 0.96 | 0.97 / 0.96 / 0.96 |
-| SVM | 0.98 | 0.99 / 0.98 / 0.98 | 0.98 / 0.98 / 0.98 |
-| XGBoost | 0.96 | 0.96 / 0.95 / 0.95 | 0.96 / 0.96 / 0.96 |
+| Random Forest | 96.49% | 0.97 / 0.96 / 0.96 | 0.97 / 0.96 / 0.96 |
+| SVM | 98.25% | 0.99 / 0.98 / 0.98 | 0.98 / 0.98 / 0.98 |
+| XGBoost | 95.61% | 0.96 / 0.95 / 0.95 | 0.96 / 0.96 / 0.96 |
 
-## Cross-Validation Results (5-Fold)
+### Cross-Validation Results (5-Fold)
 
-To ensure robustness and generalization, 5-fold cross-validation was applied to all models.
+| Model | Mean Accuracy | Std Dev |
+|------|---------------|---------|
+| Random Forest | 95.61% | +/- 2.28% |
+| SVM | 97.36% | +/- 1.47% |
+| XGBoost | 97.36% | +/- 1.47% |
 
-### Results
-
-- Random Forest: **0.9561 +/- 0.0228**
-- SVM: **0.9736 +/- 0.0147**
-- XGBoost: **0.9736 +/- 0.0147**
-
-### Key Insights
-
-- **SVM and XGBoost achieved the highest mean accuracy (97.36%)**, indicating strong predictive performance.
-- Both models also show **low standard deviation (~0.0147)**, suggesting stable performance across different folds.
-- Random Forest performed slightly lower but still maintained solid generalization capability.
-- Low variance across all models indicates that the dataset is well-structured and suitable for classification tasks.
+SVM and XGBoost achieved the highest mean accuracy (97.36%) with low variance (+/- 1.47%), confirming stable generalization across all folds. Random Forest maintained solid performance with slightly higher variance.
 
 ## Explainability Results (SHAP)
 
 Generated artifacts in `reports/`:
 
-- `shap_summary.png`: SHAP beeswarm summary (global + directionality)
-- `shap_bar.png`: mean absolute SHAP feature importance
-- `shap_force_plot.html`: interactive force plot for local explanation
+- `shap_summary.png`: SHAP beeswarm summary (global feature impact + directionality)
+- `shap_bar.png`: mean absolute SHAP feature importance ranking
+- `shap_force_plot.html`: interactive force plot for individual prediction explanation
 
-Top features (from SHAP bar chart) include:
+Top features by SHAP importance:
 
 1. `mean concave points`
 2. `worst area`
@@ -136,8 +113,6 @@ To view local explanation interactively, open `reports/shap_force_plot.html` in 
 
 ## Environment Setup
 
-Create and activate a virtual environment, then install dependencies:
-
 ```bash
 python -m venv venv
 # Windows
@@ -148,7 +123,7 @@ pip install -r requirements.txt
 
 ## How To Run
 
-Run notebooks in this order:
+Run notebooks in order:
 
 1. `notebooks/data_loading.ipynb`
 2. `notebooks/step2_eda.ipynb`
@@ -156,15 +131,14 @@ Run notebooks in this order:
 4. `notebooks/step4_model_training.ipynb`
 5. `notebooks/step5_shap_interpretability.ipynb`
 
-## Notes and Limitations
+## Notes
 
-- This project is educational and demonstrates ML workflow and model interpretability.
-- Results include both a single train/test split (`random_state=42`) and 5-fold cross-validation.
+- Results include both holdout test-set evaluation and 5-fold cross-validation for robust comparison.
 - This is not a clinical diagnostic system.
 
 ## Future Improvements
 
-- Add hyperparameter tuning
-- Add ROC-AUC and PR-AUC comparison
-- Add model persistence (joblib/pickle)
-- Add a simple inference script in `src/`
+- Hyperparameter tuning with GridSearchCV
+- ROC-AUC and PR-AUC curve comparison across models
+- Model persistence with joblib for inference deployment
+- Inference script in `src/` for standalone prediction
